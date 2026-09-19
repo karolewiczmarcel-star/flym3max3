@@ -1,4 +1,4 @@
--- MM2 FULL MENU (Fly + Noclip + ESP + Speed Hack + Auto Gun TP + Triggerbot + Alt-Quit + Spinbot + Auto Kill All + Auto Kill Murder + Fling Target + Auto Farm Coins + Farm Speed Slider + Anti-Fling + Anti-AFK + Invalid Position Bypass + Lobby/Spawn Filter)
+-- MM2 FULL MENU
 local plr = game.Players.LocalPlayer
 local cam = workspace.CurrentCamera
 local runService = game:GetService("RunService")
@@ -28,29 +28,9 @@ local walkSpeedVal = 32
 local spinSpeedVal = 50
 local farmSpeed = 17
 
-------------------------------------------------------------
--- ANTI-CHEAT & INVALID POSITION BYPASS
-------------------------------------------------------------
-pcall(function()
-    for _, v in pairs(game:GetDescendants()) do
-        if v:IsA("LocalScript") then
-            local name = v.Name:lower()
-            if name:find("cheat") or name:find("anticheat") or name:find("protect") or name:find("ban") then
-                v.Disabled = true
-            end
-        end
-    end
-end)
-
--- Czyszczenie starego GUI
-pcall(function()
-    if game.CoreGui:FindFirstChild("Nigga67") then
-        game.CoreGui.Nigga67:Destroy()
-    end
-    if game.CoreGui:FindFirstChild("FlyGuiMM2") then
-        game.CoreGui.FlyGuiMM2:Destroy()
-    end
-end)
+if game.CoreGui:FindFirstChild("Nigga67") then
+    game.CoreGui.Nigga67:Destroy()
+end
 
 -- GUI
 local g = Instance.new("ScreenGui")
@@ -67,7 +47,7 @@ mainFrame.BackgroundTransparency = 0.15
 mainFrame.BorderSizePixel = 2
 mainFrame.BorderColor3 = Color3.fromRGB(255, 120, 0)
 mainFrame.Active = true
-mainFrame.Draggable = false
+mainFrame.Draggable = true
 mainFrame.Visible = true
 mainFrame.Parent = g
 
@@ -269,7 +249,7 @@ sf4.Parent = sb4
 local b14 = createButton("Anti-Fling: OFF", 22)
 local b15 = createButton("Anti-AFK: OFF", 23)
 
--- KONTENER NA LISTĘ GRACZY (OVERLAY)
+-- KONTENER NA LISTĘ GRACZY
 local playerListFrame = Instance.new("ScrollingFrame")
 playerListFrame.Size = UDim2.new(0.9, 0, 0.7, 0)
 playerListFrame.Position = UDim2.new(0.05, 0, 0.15, 0)
@@ -288,7 +268,7 @@ listLayout.Padding = UDim.new(0, 2)
 listLayout.SortOrder = Enum.SortOrder.LayoutOrder
 listLayout.Parent = playerListFrame
 
--- OBSŁUGA SUWAKÓW MYSZKĄ
+-- OBSŁUGA SUWAKÓW
 local dragging1, dragging2, dragging3, dragging4 = false, false, false, false
 
 sb1.MouseButton1Down:Connect(function() dragging1 = true end)
@@ -305,26 +285,22 @@ end)
 uis.InputChanged:Connect(function(i)
     if i.UserInputType == Enum.UserInputType.MouseMovement then
         if dragging1 then
-            local posX = i.Position.X
-            local rel = math.clamp((posX - sb1.AbsolutePosition.X) / sb1.AbsoluteSize.X, 0, 1)
+            local rel = math.clamp((i.Position.X - sb1.AbsolutePosition.X) / sb1.AbsoluteSize.X, 0, 1)
             sf1.Size = UDim2.new(rel, 0, 1, 0)
             flySpeed = math.floor(10 + rel * 290)
             sl1.Text = "Fly Speed: " .. flySpeed
         elseif dragging2 then
-            local posX = i.Position.X
-            local rel = math.clamp((posX - sb2.AbsolutePosition.X) / sb2.AbsoluteSize.X, 0, 1)
+            local rel = math.clamp((i.Position.X - sb2.AbsolutePosition.X) / sb2.AbsoluteSize.X, 0, 1)
             sf2.Size = UDim2.new(rel, 0, 1, 0)
             walkSpeedVal = math.floor(16 + rel * 134)
             sl2.Text = "Walk Speed: " .. walkSpeedVal
         elseif dragging3 then
-            local posX = i.Position.X
-            local rel = math.clamp((posX - sb3.AbsolutePosition.X) / sb3.AbsoluteSize.X, 0, 1)
+            local rel = math.clamp((i.Position.X - sb3.AbsolutePosition.X) / sb3.AbsoluteSize.X, 0, 1)
             sf3.Size = UDim2.new(rel, 0, 1, 0)
             spinSpeedVal = math.floor(10 + rel * 190)
             sl3.Text = "Spin Speed: " .. spinSpeedVal
         elseif dragging4 then
-            local posX = i.Position.X
-            local rel = math.clamp((posX - sb4.AbsolutePosition.X) / sb4.AbsoluteSize.X, 0, 1)
+            local rel = math.clamp((i.Position.X - sb4.AbsolutePosition.X) / sb4.AbsoluteSize.X, 0, 1)
             sf4.Size = UDim2.new(rel, 0, 1, 0)
             farmSpeed = math.floor(5 + rel * 95)
             sl4.Text = "Farm Speed: " .. farmSpeed
@@ -332,14 +308,14 @@ uis.InputChanged:Connect(function(i)
     end
 end)
 
--- SKRÓTY KLAWISZOWE (Ukrywanie P / Alt-Quit)
+-- SKRÓTY KLAWISZOWE
 uis.InputBegan:Connect(function(i, gp)
     if gp then return end
     if i.KeyCode == Enum.KeyCode.P then
         mainFrame.Visible = not mainFrame.Visible
     elseif i.KeyCode == Enum.KeyCode.LeftAlt or i.KeyCode == Enum.KeyCode.RightAlt then
         if altQuitEnabled then
-            game:Shutdown()
+            pcall(function() game:Shutdown() end)
         end
     end
 end)
@@ -355,8 +331,10 @@ end)
 
 plr.Idled:Connect(function()
     if antiAfk then
-        vu:CaptureController()
-        vu:ClickButton2(Vector2.new())
+        pcall(function()
+            vu:CaptureController()
+            vu:ClickButton2(Vector2.new())
+        end)
     end
 end)
 
@@ -384,22 +362,18 @@ runService.Stepped:Connect(function()
         if not flying and not flingTargetEnabled then
             local hrp = plr.Character:FindFirstChild("HumanoidRootPart")
             if hrp then
-                if hrp.Velocity.Magnitude > 100 then
-                    hrp.Velocity = Vector3.new(0, 0, 0)
-                end
-                if hrp.RotVelocity.Magnitude > 100 then
-                    hrp.RotVelocity = Vector3.new(0, 0, 0)
-                end
+                if hrp.Velocity.Magnitude > 100 then hrp.Velocity = Vector3.new(0, 0, 0) end
+                if hrp.RotVelocity.Magnitude > 100 then hrp.RotVelocity = Vector3.new(0, 0, 0) end
             end
         end
     end
 end)
 
 ------------------------------------------------------------
--- FUNKCJE POMOCNICZE (ROLE I WERYFIKACJA CELU)
+-- LOGIKA RÓL I WERYFIKACJI
 ------------------------------------------------------------
 local function getRole(player)
-    if not player.Character then return "Innocent" end
+    if not player or not player.Character then return "Innocent" end
     local function checkContainer(c)
         if not c then return nil end
         for _, item in pairs(c:GetChildren()) do
@@ -423,11 +397,8 @@ local function isTargetValid(target)
     local hrp = char:FindFirstChild("HumanoidRootPart")
 
     if not hum or not hrp or hum.Health <= 0 then return false end
-
-    -- Ignoruje graczy z osłoną po odrodzeniu (ForceField)
     if char:FindFirstChildOfClass("ForceField") then return false end
 
-    -- Ignoruje graczy w Lobby / na Spawnie
     for _, obj in pairs(workspace:GetDescendants()) do
         if obj:IsA("SpawnLocation") or (obj.Name:lower():find("lobby") and obj:IsA("BasePart")) then
             if (hrp.Position - obj.Position).Magnitude < 100 then
@@ -435,12 +406,11 @@ local function isTargetValid(target)
             end
         end
     end
-
     return true
 end
 
 ------------------------------------------------------------
--- AUTO FARM COINS (Z BYPASSEM INVALID POSITION)
+-- AUTO FARM COINS
 ------------------------------------------------------------
 local currentTween = nil
 
@@ -493,10 +463,9 @@ task.spawn(function()
                 hrp.RotVelocity = Vector3.new(0, 0, 0)
                 
                 local distToCoin = (nearestCoin.Position - hrp.Position).Magnitude
-                local safeSpeed = math.clamp(farmSpeed, 5, 25)
-                local travelTime = distToCoin / safeSpeed
+                local travelTime = distToCoin / math.clamp(farmSpeed, 5, 25)
 
-                local tweenInfo = TweenInfo.new(travelTime, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
+                local tweenInfo = TweenInfo.new(travelTime, Enum.EasingStyle.Linear)
                 currentTween = tweenService:Create(hrp, tweenInfo, {CFrame = CFrame.new(nearestCoin.Position)})
                 currentTween:Play()
                 
@@ -652,10 +621,8 @@ runService.RenderStepped:Connect(function()
                     local hitChar = result.Instance:FindFirstAncestorOfClass("Model")
                     if hitChar then
                         local targetPlayer = game.Players:GetPlayerFromCharacter(hitChar)
-                        if targetPlayer and targetPlayer ~= plr then
-                            if getRole(targetPlayer) == "Murderer" then
-                                tool:Activate()
-                            end
+                        if targetPlayer and targetPlayer ~= plr and getRole(targetPlayer) == "Murderer" then
+                            tool:Activate()
                         end
                     end
                 end
@@ -693,9 +660,7 @@ runService.RenderStepped:Connect(function()
             hrp.CFrame = gunDrop.CFrame + Vector3.new(0, 1, 0)
         else
             if isTeleporting then
-                if originalPos then
-                    hrp.CFrame = originalPos
-                end
+                if originalPos then hrp.CFrame = originalPos end
                 isTeleporting = false
                 originalPos = nil
             end
@@ -862,9 +827,7 @@ end
 
 b11.MouseButton1Click:Connect(function()
     playerListFrame.Visible = not playerListFrame.Visible
-    if playerListFrame.Visible then
-        refreshPlayerList()
-    end
+    if playerListFrame.Visible then refreshPlayerList() end
 end)
 
 b12.MouseButton1Click:Connect(function()
