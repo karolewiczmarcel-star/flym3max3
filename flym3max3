@@ -839,7 +839,6 @@ local function refreshPlayerList()
         if child:IsA("TextButton") then child:Destroy() end
     end
     
-    local yOffset = 0
     for _, p in pairs(game.Players:GetPlayers()) do
         if p ~= plr then
             local pBtn = Instance.new("TextButton")
@@ -857,13 +856,10 @@ local function refreshPlayerList()
                 b11.Text = "Target: " .. p.Name
                 playerListFrame.Visible = false
             end)
-            yOffset = yOffset + 27
         end
     end
-    playerListFrame.CanvasSize = UDim2.new(0, 0, 0, yOffset)
 end
 
--- Otwieranie / zamykanie listy graczy
 b11.MouseButton1Click:Connect(function()
     playerListFrame.Visible = not playerListFrame.Visible
     if playerListFrame.Visible then
@@ -871,41 +867,24 @@ b11.MouseButton1Click:Connect(function()
     end
 end)
 
--- Włącznik Fling Target
 b12.MouseButton1Click:Connect(function()
     flingTargetEnabled = not flingTargetEnabled
     b12.Text = flingTargetEnabled and "Fling Target: ON" or "Fling Target: OFF"
     b12.BackgroundColor3 = flingTargetEnabled and Color3.fromRGB(255, 120, 0) or Color3.fromRGB(25, 15, 5)
 end)
 
-------------------------------------------------------------
--- LOGIKA FLING TARGET
-------------------------------------------------------------
 task.spawn(function()
     while true do
         task.wait()
-        if flingTargetEnabled and targetPlayerName and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-            local targetPlayer = game.Players:FindFirstChild(targetPlayerName)
-            if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        if flingTargetEnabled and targetPlayerName then
+            local target = game.Players:FindFirstChild(targetPlayerName)
+            if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
                 local myHrp = plr.Character.HumanoidRootPart
-                local targetHrp = targetPlayer.Character.HumanoidRootPart
-
-                for _, part in pairs(plr.Character:GetDescendants()) do
-                    if part:IsA("BasePart") then
-                        part.CanCollide = false
-                    end
-                end
-
-                local bav = Instance.new("BodyAngularVelocity")
-                bav.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
-                bav.AngularVelocity = Vector3.new(0, 999999, 0)
-                bav.Parent = myHrp
-
-                myHrp.CFrame = targetHrp.CFrame * CFrame.new(0, 0, 0)
-                myHrp.Velocity = Vector3.new(0, 0, 0)
-
-                task.wait(0.1)
-                bav:Destroy()
+                local targetHrp = target.Character.HumanoidRootPart
+                
+                myHrp.CFrame = targetHrp.CFrame
+                myHrp.Velocity = Vector3.new(99999, 99999, 99999)
+                myHrp.RotVelocity = Vector3.new(99999, 99999, 99999)
             end
         end
     end
